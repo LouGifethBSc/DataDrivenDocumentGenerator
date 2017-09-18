@@ -1,0 +1,6 @@
+# put configuration parameters here in the format name=value
+input_csv=input.csv
+max_rows=3
+id_column_name=ID
+card_layout=card_layout.xml
+card_name_prefix=CARD_

@@ -1,0 +1,50 @@
+<card>
+<card_size>
+	<size>243,153</size>
+	<margin>9</margin>
+</card_size>
+<font_size>10</font_size>
+<rectangle>
+	<position>0,0</position>
+	<size>243,153</size>
+</rectangle>
+<image>
+	<file>ioglogo.png</file>
+	<position>9,54</position>
+	<size>90,90</size>
+</image>
+<text>
+	<position>108,130</position>
+	<value>First name</value>
+	<text> </text>
+	<value>Surname</value>
+	<max_length>25</max_length>
+	<overflow>108,117</overflow>
+</text>
+<text>
+	<position>108,99</position>
+	<value>ID</value>
+</text>
+<text>
+	<position>108,72</position>
+	<text>Expiry: </text>
+	<value>Date subs next due</value>
+</text>
+<text>
+	<position>108,45</position>
+	<text>Emergency Contact:</text>
+</text>
+<text>
+	<position>108,32</position>
+	<value>ice_name</value>
+</text>
+<text>
+	<position>108,19</position>
+	<value>ice_phone</value>
+</text>
+<text>
+	<position>9,9</position>
+	<font_size>8</font_size>
+	<text>www.ipswichoutdoor.org</text>
+</text>
+</card>
