@@ -7,3 +7,6 @@ Third party libraries required:
 Apache Log4j2
 Apache PDFBox
 W3C DOM XML Parser
+
+See also: user instructions in dddg.pdf
+
