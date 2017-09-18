@@ -58,7 +58,7 @@ public class dddg { // data driven document generator
 		
 		String id_column_name = config.get("id_column_name", "id");
 		// String email_column_name = config.get("email_column_name", "email");
-		String card_layout_file = config.get("card_layout_file", CARD_LAYOUT_FILE_DEFAULT);
+		String card_layout_file = config.get("card_layout", CARD_LAYOUT_FILE_DEFAULT);
 		String card_name_prefix = config.get("card_name_prefix", CARD_NAME_PREFIX_DEFAULT);
 		// String email_subject = config.get("email_subject", "Your new membership card");
 		// String email_message_text = config.get("email_message_text", "email_message_text.txt");
