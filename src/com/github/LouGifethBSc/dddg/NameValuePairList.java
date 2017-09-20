@@ -17,7 +17,8 @@ public class NameValuePairList {
 		nvp_list = new ArrayList<NameValuePair>();
 	}
 	
-	// TODO - delete objects tidily in destructor
+	// assume there is no need to delete objects tidily in destructor like you would in C
+	// because the java garbage collector will take care of things
 	
 	// read parameters from a file with each line in the format name=value
 	void read(String filename ) {
