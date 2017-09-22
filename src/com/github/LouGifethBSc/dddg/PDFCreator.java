@@ -22,6 +22,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class PDFCreator { // TODO: should be a singleton class (only one instance needed)
 
+	private NameValuePairList config;
+	private PDFFontHelper fontHelper;
+	
+	PDFCreator(NameValuePairList config_param) { // constructor
+		config = config_param;
+		fontHelper = new PDFFontHelper(config);
+	}
+	
 	// all dimensions are in points (as in font sizes)
 	// 72 points = 1 inch
 	
@@ -33,6 +41,7 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
 	static final String DEFAULT_RECTANGLE_POSITION = "0,0";
 	static final String DEFAULT_RECTANGLE_SIZE = "100,100";
 	static final String DEFAULT_TEXT_POSITION = "0,0";
+	static final PDFont DEFAULT_FONT = PDType1Font.TIMES_ROMAN;
 	static final String DEFAULT_FONT_SIZE = "10";
 
 	private static final Logger log = LogManager.getLogger();
@@ -41,7 +50,6 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
 	private PDDocument pdf_document;
 	private PDPage pdf_page;
 	private PDPageContentStream pdf_content;
-	private PDFont pdf_font;
 
 	// XML document stuff ...
     private DocumentBuilderFactory xml_dbFactory;
@@ -50,6 +58,7 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
     
     private NameValuePairList text_substitutions;
     private int card_margin = Integer.parseInt(DEFAULT_CARD_MARGIN);
+    private PDFont global_font = DEFAULT_FONT;
     private int global_font_size = Integer.parseInt(DEFAULT_FONT_SIZE);
 
 	public void create (String cardname, String card_layout_file, NameValuePairList subs) {
@@ -61,7 +70,6 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
     		pdf_page = new PDPage();
     		pdf_document.addPage(pdf_page);
     		pdf_content = new PDPageContentStream(pdf_document, pdf_page, AppendMode.APPEND, true, true);
-    		pdf_font = PDType1Font.HELVETICA; // TODO - read font from layout file
 
     		// the pdf document is now a single blank a4 page
     		// add remaining elements as defined in xml layout file
@@ -92,8 +100,8 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
 			            	add_rectangle(element);
 			            }
 			            else
-		                if (elementName.equals("font_size")) {
-		            	    set_font_size(element);
+		                if (elementName.equals("font")) {
+		            	    set_font(element);
 		                }
 		                else
 			            if (elementName.equals("image")) {
@@ -177,12 +185,27 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
         }
 	}
 
-	void set_font_size(Element element) {
-		// set global font size to be used for all future text elements
+	void set_font(Element element) {
+		
+		// set global font and font size to be used for all future text elements
 		// (can be over-ridden for individual text elements)
-		String font_size_string = element.getTextContent();
-		// log.trace("font_size={}", font_size_string);
-		global_font_size = Integer.parseInt(font_size_string);
+
+		PDFont new_font = get_font(element);
+		if (new_font == null) {
+			// leave global_font unchanged if <font> tag is missing
+		}
+		else {
+			global_font = new_font;
+		}
+        
+        String size_string = get_subelement_value(element, "size");
+        if (size_string.equals("")) {
+        	// leave global_font_size unchanged if <size> tag is missing
+        }
+        else {
+            global_font_size = Integer.parseInt(size_string);
+        }
+
 	}
 
 	void add_image(Element element) {
@@ -229,7 +252,17 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
             int x = Integer.parseInt(position_xy[0]);
             int y = Integer.parseInt(position_xy[1]);
 
-            String size_string = get_subelement_value(element, "font_size");
+            PDFont text_font;
+            PDFont new_font = get_font(element);
+            if (new_font == null) {
+            	// font not specified - use global font
+            	text_font = global_font;
+            }
+            else {
+            	// override global font for this text element
+            	text_font = new_font;
+            }
+            String size_string = get_subelement_value(element, "size");
             int text_font_size;
             if (size_string.equals("")) {
             	// font size not specified - use global font size
@@ -274,21 +307,21 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
                         int overflow_y = Integer.parseInt(overflow_position_xy[1]);
                         
                         // the overflow text may still itself overflow but that's just too bad ...
-                        add_text_to_pdf(overflow_x, overflow_y, text_string_overflow, text_font_size);
+                        add_text_to_pdf(overflow_x, overflow_y, text_string_overflow, text_font, text_font_size);
                     }
                 }
             }
             
-	    	add_text_to_pdf(x, y, text_string, text_font_size);
+	    	add_text_to_pdf(x, y, text_string, text_font, text_font_size);
 	    	
         } catch (Exception e) {
         	e.printStackTrace();
         }
 	}
 	
-	void add_text_to_pdf(int x, int y, String text, int font_size) {
+	void add_text_to_pdf(int x, int y, String text, PDFont font, int font_size) {
 		try {
-    		pdf_content.setFont(pdf_font, font_size);
+    		pdf_content.setFont(font, font_size);
     		pdf_content.beginText();
   		    pdf_content.newLineAtOffset(card_margin+x, card_margin+y);
   		    pdf_content.showText(text);
@@ -306,6 +339,15 @@ public class PDFCreator { // TODO: should be a singleton class (only one instanc
      	  // ignore any further subelements with the same name
         }
 		return value;
+	}
+	
+	PDFont get_font(Element e) {
+
+		String font_string = get_subelement_value(e, "font");
+		String style_string = get_subelement_value(e, "style");
+		
+		return fontHelper.get_font(pdf_document, font_string, style_string);
+		
 	}
 	
 	String get_text(Element e) {

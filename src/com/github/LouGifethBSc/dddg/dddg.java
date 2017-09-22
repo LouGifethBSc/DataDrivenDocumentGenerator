@@ -63,7 +63,7 @@ public class dddg { // data driven document generator
 		// String email_subject = config.get("email_subject", "Your new membership card");
 		// String email_message_text = config.get("email_message_text", "email_message_text.txt");
 
-		PDFCreator pdfCreator = new PDFCreator();
+		PDFCreator pdfCreator = new PDFCreator(config);
 		
 		try {
 	        FileReader f = new FileReader(csv_filename);

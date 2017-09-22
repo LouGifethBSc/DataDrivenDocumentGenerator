@@ -3,7 +3,10 @@
 	<size>243,153</size>
 	<margin>9</margin>
 </card_size>
-<font_size>10</font_size>
+<font>
+	<font>Arial</font>
+	<size>10</size>
+</font>
 <rectangle>
 	<position>0,0</position>
 	<size>243,153</size>
@@ -44,7 +47,7 @@
 </text>
 <text>
 	<position>9,9</position>
-	<font_size>8</font_size>
+	<size>8</size>
 	<text>www.ipswichoutdoor.org</text>
 </text>
 </card>
